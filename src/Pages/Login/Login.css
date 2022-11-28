@@ -1,0 +1,139 @@
+.loginContainer {
+  background-image: url("../../img/Login background.png");
+}
+.navbarContainer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 10px;
+}
+.navbarContainer a {
+  color: #fff;
+}
+.loginContainerMargin {
+  margin: 0 130px;
+}
+.navbarLeftSide {
+  display: flex;
+  align-items: center;
+  gap: 43px;
+}
+.navbarRightSide {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+.navbarActive {
+  background-color: #fff;
+  color: #000 !important;
+  border-radius: 10px;
+  padding: 5px 20px;
+  font-weight: 600;
+  font-size: 16px;
+}
+.mainLoginContainer {
+  margin-top: 120px;
+  display: flex;
+  justify-content: space-between;
+}
+.mainLoginContainer > .mainLoginLeftSide {
+  padding: 20px 0;
+}
+.mainLoginLeftSide h1 {
+  width: 470px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 50px;
+  line-height: 60px;
+}
+.mainLoginLeftSide span {
+  color: #f0648c;
+}
+.mainLoginLeftSide img {
+  margin-top: 50px;
+  width: 400px;
+  height: 65px;
+}
+.mainLoginRightSide {
+  flex-basis: 40%;
+}
+.mainLoginRightSide > form {
+  background-color: #f7fafc;
+  border-radius: 15px;
+  padding: 40px 40px 60px 40px;
+}
+.loginFormHeading > p {
+  color: rgba(48, 48, 48, 0.43);
+}
+.loginFormMain {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+  margin-top: 50px;
+  padding: 0 30px;
+}
+.loginFormMain > label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.loginFormMain > label > a {
+  width: fit-content;
+  color: #4299e1;
+  font-weight: 400;
+}
+.loginFormMain > label > input {
+  border-radius: 10px;
+  height: 30px;
+  border: 1px solid rgba(0, 0, 0, 0.21);
+  padding-left: 15px;
+  outline: none;
+}
+.loginFormMain > span {
+  color:  #f0648c;
+  font-weight: 600;
+}
+.loginSubmitForm {
+  background-color: #4299e1;
+  border: none;
+  padding: 10px 0;
+  border-radius: 15px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 550;
+  cursor: pointer;
+}
+.loginFormSignUp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loginFormSignUp > a {
+  color: #4299e1;
+  padding-left: 3px;
+}
+.loginFooterContainer {
+  display: flex;
+  gap: 20px;
+  background-color: #fff;
+  margin-top: 90px;
+  padding: 45px 0 30px 17px;
+}
+.loginFooterContainer p {
+  color: rgba(0, 0, 0, 0.73);
+}
+.loginFooterContainer > div {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.loginFooterContainer > .loginFooterLeftside > img {
+  width: fit-content;
+}
+.loginFooterLeftside {
+  flex-basis: 50%;
+}
+.loginFooterLefsideFollowUs {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
