@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import Logo from "../../img/Logo.png";
 import Group from "../../img/Group 1.png";
 import "./Login.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../../Firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
   const handleSignIn = (e) => {
     e.preventDefault();
     const emailRegex =
@@ -17,7 +18,10 @@ const Login = () => {
       setMessage("Invalid Email");
     } else {
       signInWithEmailAndPassword(auth, email, password)
-        .then((res) => console.log(res))
+        .then((res) => {
+          localStorage.setItem("email", res.user.email);
+          navigate("/home");
+        })
         .catch((err) => {
           const errCode = err.code;
           if (errCode == "auth/user-not-found") {

@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import Logo from "../../img/Logo.png";
 import Group from "../../img/Group 1.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./SignUp.css";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth } from "../../Firebase";
+import { provider } from "./../../Firebase";
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
   const handleSignUp = (e) => {
     e.preventDefault();
     const emailRegex =
@@ -22,9 +24,8 @@ const SignUp = () => {
     if (emailRegex.test(email) && password.length >= 6) {
       createUserWithEmailAndPassword(auth, email, password)
         .then((res) => {
-          if (res.operationType == "signIn") {
-            setMessage("Email created successfull");
-          }
+          localStorage.setItem("email", res.user.email);
+          navigate("/home");
         })
         .catch((err) => {
           const errCode = err.code;
@@ -33,6 +34,13 @@ const SignUp = () => {
           }
         });
     }
+  };
+  const signUpWithGoogle = (e) => {
+    e.preventDefault();
+    signInWithPopup(auth, provider).then((res) => {
+      localStorage.setItem("email", res.user.email);
+      navigate("/home");
+    });
   };
   return (
     <div className="signUpContainer">
@@ -57,7 +65,7 @@ const SignUp = () => {
             <img src={Group} alt="" />
           </div>
           <div className="mainSignUpRightSide">
-            <form onSubmit={handleSignUp}>
+            <form>
               <div className="loginFormHeading">
                 <h2>Join Us!</h2>
                 <p>
@@ -84,7 +92,7 @@ const SignUp = () => {
                   <a href="">Forgot password?</a>
                 </label>
                 {message && <span>{message}</span>}
-                <button type="submit" className="loginSubmitForm">
+                <button onClick={handleSignUp} className="loginSubmitForm">
                   Sign Up
                 </button>
                 <div className="loginFormSignUp">
@@ -92,7 +100,7 @@ const SignUp = () => {
                   <Link to={"/"}>Login</Link>
                 </div>
                 <div className="signUpWithGoogle">
-                  <button>
+                  <button onClick={signUpWithGoogle}>
                     <img
                       src="https://img.icons8.com/color/512/google-logo.png"
                       alt=""
