@@ -1,45 +1,50 @@
 import React, { useState } from "react";
 import Logo from "../../img/Logo.png";
 import Group from "../../img/Group 1.png";
-import "./Login.css";
 import { Link } from "react-router-dom";
+import "./SignUp.css";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../Firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
-const Login = () => {
+const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const handleSignIn = (e) => {
+  const handleSignUp = (e) => {
     e.preventDefault();
     const emailRegex =
       /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     if (!emailRegex.test(email)) {
-      setMessage("Invalid Email");
-    } else {
-      signInWithEmailAndPassword(auth, email, password)
-        .then((res) => console.log(res))
+      setMessage("Invalid email");
+    }
+    if (password.length < 6) {
+      setMessage("Password must be at least 6");
+    }
+    if (emailRegex.test(email) && password.length >= 6) {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((res) => {
+          if (res.operationType == "signIn") {
+            setMessage("Email created successfull");
+          }
+        })
         .catch((err) => {
           const errCode = err.code;
-          if (errCode == "auth/user-not-found") {
-            setMessage("Email not found");
-          } else {
-            setMessage("Wrong password. Please try again");
+          if (errCode == "auth/email-already-in-use") {
+            setMessage("Email already in use");
           }
         });
     }
   };
   return (
-    <div className="loginContainer">
-      <div className="loginContainerMargin">
-        <div className="navbarContainer">
-          <div className="navbarLeftSide">
+    <div className="signUpContainer">
+      <div className="signUpContainerMargin">
+        <div className="signUpNavbarContainer">
+          <div className="signUpnavbarLeftSide">
             <img src={Logo} alt="Logo" />
             <Link to={""}>Features</Link>
             <Link to={""}>Pricing</Link>
           </div>
-          <div className="navbarRightSide">
-            <Link to={"/signup"}>Sign Up</Link>
-            <Link to={"/"} className="navbarActive">
+          <div className="signUpnavbarRightSide">
+            <Link to={"/"} className="signUpNavbarActive">
               Login
             </Link>
           </div>
@@ -51,11 +56,14 @@ const Login = () => {
             </h1>
             <img src={Group} alt="" />
           </div>
-          <div className="mainLoginRightSide">
-            <form onSubmit={handleSignIn}>
+          <div className="mainSignUpRightSide">
+            <form onSubmit={handleSignUp}>
               <div className="loginFormHeading">
-                <h2>Log in your Account!</h2>
-                <p>To enjoy all of our cool features</p>
+                <h2>Join Us!</h2>
+                <p>
+                  We're looking for amazing engineers just like you! Become a
+                  part of our rockstar community and skyrocket your career!
+                </p>
               </div>
               <div className="loginFormMain">
                 <label>
@@ -77,11 +85,20 @@ const Login = () => {
                 </label>
                 {message && <span>{message}</span>}
                 <button type="submit" className="loginSubmitForm">
-                  Sign in
+                  Sign Up
                 </button>
                 <div className="loginFormSignUp">
-                  <p>-A new user? </p>
-                  <Link to={"/signup"}>Sign Up</Link>
+                  <p>All ready a user? </p>
+                  <Link to={"/"}>Login</Link>
+                </div>
+                <div className="signUpWithGoogle">
+                  <button>
+                    <img
+                      src="https://img.icons8.com/color/512/google-logo.png"
+                      alt=""
+                    />
+                    <p>Sign up with Google</p>
+                  </button>
                 </div>
               </div>
             </form>
@@ -150,4 +167,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;

@@ -1,5 +1,30 @@
 .loginContainer {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
   background-image: url("../../img/Login background.png");
+}
+.loginContainer::after {
+  position: absolute;
+  content: "";
+  bottom: 0;
+  right: 0;
+  transform: translateX(50%);
+  z-index: -1;
+  height: 730px;
+  width: 730px;
+  background: linear-gradient(
+      151.68deg,
+      rgba(192, 115, 205, 0.2) 35.5%,
+      rgba(0, 0, 0, 0) 82.49%
+    ),
+    linear-gradient(
+      203.88deg,
+      #9967b5 14.14%,
+      rgba(96, 44, 129, 0.629604) 65.2%,
+      rgba(147, 101, 176, 0.54) 77.55%
+    );
+  border-radius: 50%;
 }
 .navbarContainer {
   display: flex;
@@ -89,7 +114,7 @@
   outline: none;
 }
 .loginFormMain > span {
-  color:  #f0648c;
+  color: #f0648c;
   font-weight: 600;
 }
 .loginSubmitForm {
