@@ -19,7 +19,7 @@ const Login = () => {
     } else {
       signInWithEmailAndPassword(auth, email, password)
         .then((res) => {
-          localStorage.setItem("email", res.user.email);
+          localStorage.setItem("id", res.user.uid);
           navigate("/home");
         })
         .catch((err) => {

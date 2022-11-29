@@ -6,25 +6,29 @@ import {
   deleteDoc,
   doc,
   addDoc,
+  updateDoc,
 } from "firebase/firestore";
-import { Link } from "react-router-dom";
 import { db } from "./../../Firebase";
 
 const Home = () => {
-  const postsCollectionRef = collection(db, "posts");
+  const id = localStorage.getItem("id");
+  const postsCollectionRef = collection(db, "users", id, "status");
   const [post, setPost] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [img, setImg] = useState();
+  const [show, setShow] = useState(false);
+  const [idUpdate, setIdUpdate] = useState();
   useEffect(() => {
     getDocs(postsCollectionRef)
-      .then((res) =>
-        setPost(res.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
-      )
+      .then((res) => {
+        setPost(res.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      })
       .catch((err) => console.log(err));
   }, []);
-  var handleDeletePost = (id) => {
-    const postDoc = doc(db, "posts", id);
+
+  const handleDeletePost = (statusId) => {
+    const postDoc = doc(db, "users", id, "status", statusId);
     deleteDoc(postDoc);
   };
   const handleAddPost = (e) => {
@@ -63,6 +67,14 @@ const Home = () => {
       };
     });
   };
+  const handleUpdatePost = (e) => {
+    e.preventDefault();
+    // const userDoc = doc(db, "posts", idUpdate);
+    // const newFields = { title, content, img };
+    // updateDoc(userDoc, newFields)
+    //   .then((res) => console.log(res))
+    //   .catch((err) => console.log(err.code));
+  };
   return (
     <div className="homeContainer">
       <div className="homeContainerLeftSide">
@@ -78,7 +90,15 @@ const Home = () => {
                 <p>Create At: {post.createAt}</p>
                 <p>Author: {post.author}</p>
                 <div className="homeContentRightSideBtn">
-                  <Link className="homeContentRightSideLink">Read more</Link>
+                  <button
+                    className="homeContentRightSideLink"
+                    onClick={() => {
+                      setShow(!show);
+                      setIdUpdate(post.id);
+                    }}
+                  >
+                    Update Post
+                  </button>
                   <button onClick={() => handleDeletePost(post.id)}>
                     Delete
                   </button>
@@ -88,6 +108,39 @@ const Home = () => {
           );
         })}
       </div>
+      {show && (
+        <div className="homeContainerRightSide updatePostContainer">
+          <form onSubmit={handleUpdatePost}>
+            <h3>Update Post</h3>
+            <label>
+              Title:{" "}
+              <input
+                type="text"
+                placeholder="Your new title"
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </label>
+            <label>
+              Content:
+              <textarea
+                name=""
+                id=""
+                cols="20"
+                rows="5"
+                placeholder="Your new content"
+                onChange={(e) => setContent(e.target.value)}
+              ></textarea>
+            </label>
+            <label>
+              Img: <input type="file" onChange={(e) => uploadImg(e)} />
+            </label>
+            <div className="updateBoxBtn">
+              <button type="submit">Update post</button>
+              <button onClick={() => setShow(!show)}>Close</button>
+            </div>
+          </form>
+        </div>
+      )}
       <div className="homeContainerRightSide">
         <form onSubmit={handleAddPost}>
           <h3>Add a post</h3>

@@ -4,27 +4,39 @@ import Group from "../../img/Group 1.png";
 import { Link, useNavigate } from "react-router-dom";
 import "./SignUp.css";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth } from "../../Firebase";
+import { auth, db } from "../../Firebase";
 import { provider } from "./../../Firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [data, setData] = useState({});
   const navigate = useNavigate();
+  const handleInput = (e) => {
+    const id = e.target.id;
+    const value = e.target.value;
+
+    setData({ ...data, [id]: value });
+  };
   const handleSignUp = (e) => {
     e.preventDefault();
     const emailRegex =
       /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(data.email)) {
       setMessage("Invalid email");
     }
-    if (password.length < 6) {
+    if (data.password.length < 6) {
       setMessage("Password must be at least 6");
     }
-    if (emailRegex.test(email) && password.length >= 6) {
-      createUserWithEmailAndPassword(auth, email, password)
+    if (emailRegex.test(data.email) && data.password.length >= 6) {
+      createUserWithEmailAndPassword(auth, data.email, data.password)
         .then((res) => {
-          localStorage.setItem("email", res.user.email);
+          setDoc(doc(db, "users", res.user.uid), {
+            ...data,
+            timeStamp: serverTimestamp(),
+          });
+          localStorage.setItem("id", res.user.uid);
           navigate("/home");
         })
         .catch((err) => {
@@ -38,7 +50,7 @@ const SignUp = () => {
   const signUpWithGoogle = (e) => {
     e.preventDefault();
     signInWithPopup(auth, provider).then((res) => {
-      localStorage.setItem("email", res.user.email);
+      localStorage.setItem("id", res.user.uid);
       navigate("/home");
     });
   };
@@ -79,7 +91,8 @@ const SignUp = () => {
                   <input
                     type="text"
                     placeholder="Your Email"
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="email"
+                    onChange={handleInput}
                   />
                 </label>
                 <label>
@@ -87,7 +100,8 @@ const SignUp = () => {
                   <input
                     type="password"
                     placeholder="Your Password"
-                    onChange={(e) => setPassword(e.target.value)}
+                    id="password"
+                    onChange={handleInput}
                   />
                   <a href="">Forgot password?</a>
                 </label>
