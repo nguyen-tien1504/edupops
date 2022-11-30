@@ -2,14 +2,14 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-
+import { getStorage } from "firebase/storage";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: 'AIzaSyBUYkrCMR-zm4aAhCmQgWYEOjo41rYv95A',
+  apiKey: "AIzaSyBUYkrCMR-zm4aAhCmQgWYEOjo41rYv95A",
   authDomain: "edupops-server.firebaseapp.com",
   projectId: "edupops-server",
   storageBucket: "edupops-server.appspot.com",
@@ -24,3 +24,5 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
+// Initialize Cloud Storage and get a reference to the service
+export const storage = getStorage(app, "gs://edupops-server.appspot.com/");

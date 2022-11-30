@@ -7,18 +7,33 @@ import {
   doc,
   addDoc,
   updateDoc,
+  serverTimestamp,
 } from "firebase/firestore";
-import { db } from "./../../Firebase";
+import {
+  deleteObject,
+  getDownloadURL,
+  getMetadata,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { db, storage } from "./../../Firebase";
 
 const Home = () => {
   const id = localStorage.getItem("id");
   const postsCollectionRef = collection(db, "users", id, "status");
   const [post, setPost] = useState([]);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [img, setImg] = useState();
   const [show, setShow] = useState(false);
-  const [idUpdate, setIdUpdate] = useState();
+  const [data, setData] = useState({});
+  const [img, setImg] = useState();
+  const [dataUpdate, setDataUpdate] = useState({});
+  const [per, setPer] = useState(null);
+  const options = {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  };
   useEffect(() => {
     getDocs(postsCollectionRef)
       .then((res) => {
@@ -27,54 +42,101 @@ const Home = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  const handleDeletePost = (statusId) => {
+  const handleDeletePost = (statusId, imgName) => {
     const postDoc = doc(db, "users", id, "status", statusId);
-    deleteDoc(postDoc);
+    deleteDoc(postDoc).then(() => {
+      const desertRef = ref(storage, imgName);
+      deleteObject(desertRef)
+        .then(() => {
+          console.log("file deleted");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
   };
   const handleAddPost = (e) => {
     e.preventDefault();
-    const day = new Date();
-    const option = {
-      weekday: "short",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    };
-    const createAt = day.toLocaleDateString("en-US", option);
     addDoc(postsCollectionRef, {
-      content,
-      title,
-      img,
-      createAt,
+      content: data.content,
+      title: data.title,
+      img: data.img,
+      timeStamp: serverTimestamp(),
     })
-      .then((res) => console.log(res))
+      .then((res) => alert("Your post was uploaded"))
       .catch((err) => console.log(err.code));
   };
-  const uploadImg = async (e) => {
-    const file = e.target.files[0];
-    const base64 = await convert(file);
-    setImg(base64);
-  };
-  const convert = (file) => {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      };
-      fileReader.onerror = (err) => {
-        reject(err);
-      };
-    });
-  };
+
   const handleUpdatePost = (e) => {
     e.preventDefault();
-    // const userDoc = doc(db, "posts", idUpdate);
-    // const newFields = { title, content, img };
-    // updateDoc(userDoc, newFields)
-    //   .then((res) => console.log(res))
-    //   .catch((err) => console.log(err.code));
+    const userDoc = doc(db, "users", id, "status", dataUpdate.id);
+    updateDoc(userDoc, data)
+      .then((res) => alert("Your post was updated"))
+      .then(() => {
+        const desertRef = ref(storage, dataUpdate.img.imgName);
+        deleteObject(desertRef)
+          .then(() => {
+            console.log("file deleted");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      })
+      .catch((err) => console.log(err.code));
   };
+  const handleInputAddPost = (e) => {
+    const id = e.target.id;
+    const value = e.target.value;
+    setData({ ...data, [id]: value });
+  };
+  useEffect(() => {
+    const uploadFile = async () => {
+      const name = new Date().getTime() + img.name;
+      const storageRef = ref(storage, name);
+      const uploadTask = uploadBytesResumable(storageRef, img);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+          setPer(progress);
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+            default:
+              break;
+          }
+        },
+        (error) => {
+          console.log(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref)
+            .then((downloadURL) => {
+              setData((prev) => ({ ...prev, img: { imgURL: downloadURL } }));
+            })
+            .then(() => {
+              getMetadata(storageRef)
+                .then((metadata) => {
+                  setData((prev) => ({
+                    ...prev,
+                    img: { ...prev.img, imgName: metadata.name },
+                  }));
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            });
+        }
+      );
+    };
+    img && uploadFile();
+  }, [img]);
   return (
     <div className="homeContainer">
       <div className="homeContainerLeftSide">
@@ -82,24 +144,30 @@ const Home = () => {
           return (
             <div className="homeContentContainer" key={post.id}>
               <div className="homeContentLeftSide">
-                <img src={post.img} alt="" />
+                <img src={post.img.imgURL} alt="" />
               </div>
               <div className="homeContentRightSide">
                 <h2>{post.title}</h2>
                 <p className="homeContentRightSidePost">{post.content}</p>
-                <p>Create At: {post.createAt}</p>
-                <p>Author: {post.author}</p>
+                <p>
+                  Create At:{" "}
+                  {post?.timeStamp
+                    ?.toDate()
+                    .toLocaleDateString("en-US", options)}
+                </p>
                 <div className="homeContentRightSideBtn">
                   <button
                     className="homeContentRightSideLink"
                     onClick={() => {
                       setShow(!show);
-                      setIdUpdate(post.id);
+                      setDataUpdate(post);
                     }}
                   >
                     Update Post
                   </button>
-                  <button onClick={() => handleDeletePost(post.id)}>
+                  <button
+                    onClick={() => handleDeletePost(post.id, post.img.imgName)}
+                  >
                     Delete
                   </button>
                 </div>
@@ -116,28 +184,42 @@ const Home = () => {
               Title:{" "}
               <input
                 type="text"
+                id="title"
                 placeholder="Your new title"
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={handleInputAddPost}
               />
             </label>
             <label>
               Content:
               <textarea
                 name=""
-                id=""
+                id="content"
                 cols="20"
                 rows="5"
                 placeholder="Your new content"
-                onChange={(e) => setContent(e.target.value)}
+                onChange={handleInputAddPost}
               ></textarea>
             </label>
             <label>
-              Img: <input type="file" onChange={(e) => uploadImg(e)} />
+              Img:{" "}
+              <input
+                type="file"
+                id="img"
+                onChange={(e) => setImg(e.target.files[0])}
+              />
             </label>
             <div className="updateBoxBtn">
               <button type="submit">Update post</button>
+
               <button onClick={() => setShow(!show)}>Close</button>
             </div>
+            {per == null ? (
+              ""
+            ) : per == 100 ? (
+              <span>Done</span>
+            ) : (
+              <span>Please Wait...</span>
+            )}
           </form>
         </div>
       )}
@@ -149,25 +231,42 @@ const Home = () => {
             <input
               type="text"
               placeholder="Your title here"
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={handleInputAddPost}
+              id="title"
             />
           </label>{" "}
           <label>
             Content:{" "}
             <textarea
               name=""
-              id=""
+              id="content"
               cols="20"
               rows="5"
               maxLength={140}
               placeholder="Your content here"
-              onChange={(e) => setContent(e.target.value)}
+              onChange={handleInputAddPost}
             ></textarea>
           </label>{" "}
           <label>
-            Img: <input type="file" onChange={(e) => uploadImg(e)} />
+            Img:{" "}
+            <input
+              type="file"
+              id="img"
+              onChange={(e) => setImg(e.target.files[0])}
+            />
           </label>
-          <button type="submit">Add post</button>
+          <div className="addBtnContainer">
+            <button type="submit" disabled={per < 100}>
+              Add post
+            </button>
+            {per == null ? (
+              ""
+            ) : per == 100 ? (
+              <span>Done</span>
+            ) : (
+              <span>Please Wait...</span>
+            )}
+          </div>
         </form>
       </div>
     </div>

@@ -2,7 +2,6 @@
   margin: 20px 100px;
   display: flex;
   gap: 100px;
-  position: relative;
 }
 .homeContentContainer {
   display: flex;
@@ -45,8 +44,8 @@
 }
 .updatePostContainer {
   position: absolute;
-  width: 50%;
-  height: 50%;
+  width: 575px;
+  height: 268px;
   background-color: rgb(233, 220, 220);
   top: 50%;
   left: 50%;
@@ -57,7 +56,7 @@
   border-radius: 15px;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
-.updateBoxBtn{
+.updateBoxBtn {
   display: flex;
   gap: 5px;
   margin-top: 5px;
@@ -75,7 +74,7 @@
   outline: none;
   padding-left: 10px;
 }
-.homeContainerRightSide > form  button {
+.homeContainerRightSide > form button {
   background-color: #4299e1;
   border: none;
   cursor: pointer;
