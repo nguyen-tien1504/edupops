@@ -21,7 +21,6 @@ import { db, storage } from "./../../Firebase";
 
 const Home = () => {
   const id = localStorage.getItem("id");
-  const postsCollectionRef = collection(db, "users", id, "status");
   const [post, setPost] = useState([]);
   const [show, setShow] = useState(false);
   const [data, setData] = useState({});
@@ -34,6 +33,7 @@ const Home = () => {
     month: "short",
     day: "numeric",
   };
+  const postsCollectionRef = collection(db, "users", id, "status");
   useEffect(() => {
     getDocs(postsCollectionRef)
       .then((res) => {
