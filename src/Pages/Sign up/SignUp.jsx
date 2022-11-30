@@ -8,8 +8,6 @@ import { auth, db } from "../../Firebase";
 import { provider } from "./../../Firebase";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 const SignUp = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [data, setData] = useState({});
   const navigate = useNavigate();
