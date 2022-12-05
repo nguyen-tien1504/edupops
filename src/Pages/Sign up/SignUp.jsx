@@ -14,7 +14,6 @@ const SignUp = () => {
   const handleInput = (e) => {
     const id = e.target.id;
     const value = e.target.value;
-
     setData({ ...data, [id]: value });
   };
   const handleSignUp = (e) => {
