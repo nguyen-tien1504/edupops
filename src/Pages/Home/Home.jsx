@@ -71,18 +71,21 @@ const Home = () => {
     e.preventDefault();
     const userDoc = doc(db, "users", id, "status", dataUpdate.id);
     updateDoc(userDoc, data)
-      .then((res) => alert("Your post was updated"))
       .then(() => {
-        const desertRef = ref(storage, dataUpdate.img.imgName);
-        deleteObject(desertRef)
-          .then(() => {
-            console.log("file deleted");
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        if (data.img) {
+          const desertRef = ref(storage, dataUpdate.img.imgName);
+          deleteObject(desertRef)
+            .then(() => {
+              console.log("file deleted");
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
       })
+      .then(() => alert("Your post was updated"))
       .catch((err) => console.log(err.code));
+      console.log(data);
   };
   const handleInputAddPost = (e) => {
     const id = e.target.id;
