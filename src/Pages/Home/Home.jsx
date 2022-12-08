@@ -116,22 +116,24 @@ const Home = () => {
           console.log(error);
         },
         () => {
-          getDownloadURL(uploadTask.snapshot.ref)
-            .then((downloadURL) => {
-              setData((prev) => ({ ...prev, img: { imgURL: downloadURL } }));
-            })
-            .then(() => {
-              getMetadata(storageRef)
-                .then((metadata) => {
-                  setData((prev) => ({
-                    ...prev,
-                    img: { ...prev.img, imgName: metadata.name },
-                  }));
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
-            });
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setData((prev) => ({
+              ...prev,
+              img: { imgURL: downloadURL, imgName: name },
+            }));
+          });
+          // .then(() => {
+          //   getMetadata(storageRef)
+          //     .then((metadata) => {
+          //       setData((prev) => ({
+          //         ...prev,
+          //         img: { ...prev.img, imgName: metadata.name },
+          //       }));
+          //     })
+          //     .catch((error) => {
+          //       console.log(error);
+          //     });
+          // });
         }
       );
     };

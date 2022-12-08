@@ -48,6 +48,11 @@ const SignUp = () => {
   const signUpWithGoogle = (e) => {
     e.preventDefault();
     signInWithPopup(auth, provider).then((res) => {
+      // setDoc(doc(db, "users", res.user.uid), {
+      //   ...data,
+      //   password: null,
+      //   timeStamp: serverTimestamp(),
+      // });
       localStorage.setItem("id", res.user.uid);
       navigate("/home");
     });
